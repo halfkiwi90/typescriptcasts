@@ -136889,16 +136889,22 @@ var faker_1 = __importDefault(require("faker")); // faker 묘듈을 import 할 �
 // 타입 정의 파일 설치후 (linux) 컨트롤 키와 함께 faker 를 클릭하면 타입정의파일로 이동하고 정의된 타입들을 볼 수 있다.
 // faker 에서 adress 의 lat과 lng 는 문자열인것을 확인 했다.
 // lat 과 lng 을 랜덤하게 생성해서 구글맵에 표시 하려고 한다.
+// implements 로 이 클래스가 Mappable타입을 충족하는지 확인할 수 있다.
 
 
 var User = function () {
   function User() {
+    this.color = 'red';
     this.name = faker_1.default.name.findName();
     this.location = {
       lat: parseFloat(faker_1.default.address.latitude()),
       lng: parseFloat(faker_1.default.address.longitude())
     };
   }
+
+  User.prototype.markerContent = function () {
+    return "User name: " + this.name;
+  };
 
   return User;
 }();
@@ -136922,6 +136928,7 @@ var faker_1 = __importDefault(require("faker"));
 
 var Company = function () {
   function Company() {
+    this.color = 'blue';
     this.companyName = faker_1.default.company.companyName();
     this.catchPhrase = faker_1.default.company.catchPhrase(); // dot notaion 으로 기입하면 안된다. ex) this.location.lat = 30 
 
@@ -136931,11 +136938,98 @@ var Company = function () {
     };
   }
 
+  Company.prototype.markerContent = function () {
+    return "Company name: " + this.companyName;
+  };
+
   return Company;
 }();
 
 exports.Company = Company;
-},{"faker":"../../../node_modules/faker/index.js"}],"src/index.ts":[function(require,module,exports) {
+},{"faker":"../../../node_modules/faker/index.js"}],"src/Map.ts":[function(require,module,exports) {
+"use strict"; // html script 태그로 google maps 를 불러와서 api를 사용하려고 한다..
+// 브라우서 콘솔에서 google 이라는 변수가 있음을 확인 할 수 있다.
+// 하지만 ts 에서는 google을 인식 할 수 없다. 
+// 이전과 마찬가지로 google maps api 를 위한 타입 정의 파일을 npm 으로 다운 받아야 한다.
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Map = void 0;
+
+var Map = function () {
+  // 재사용성을 높이기 위해 divId 추가
+  function Map(divId) {
+    this.googleMap = new google.maps.Map(document.getElementById(divId), {
+      zoom: 1,
+      center: {
+        lat: 0,
+        lng: 0
+      }
+    });
+  } // 메소드 이름만 다를뿐 동작이 같은 메소드 들이다. 
+  // 하나로 압축 하는 것이 좋다.
+  // // 클래스로 타입을 지정해 줄 수 있음.
+  // addUserMarker(user: User): void {
+  // 	new google.maps.Marker({
+  // 		map: this.googleMap,
+  // 		position: {
+  // 			lat: user.location.lat,
+  // 			lng: user.location.lng
+  // 		}
+  // 	})
+  // }
+  // addCompanyMarker(company: Company): void {
+  // 	new google.maps.Marker({
+  // 		map: this.googleMap,
+  // 		position: {
+  // 			lat: company.location.lat,
+  // 			lng: company.location.lng
+  // 		}
+  // 	})
+  // }
+  // 방법 1.
+  // User | Company 유니언 결합으로 두 클래스으 공통 필드인 location만 추출했다. 
+  // 단점 확장성이 떨어진다. 마커하고 싶은 새로운 클래스를 만들때마다 전달인자에 or 로 붙여줘야 한다.
+  // addMarker(mappable: User | Company): void {
+  // 	// mappable.name 은 사용할 수 없다.
+  // 	new google.maps.Marker({
+  // 		map: this.googleMap,
+  // 		position: {
+  // 			lat: mappable.location.lat,
+  // 			lng: mappable.location.lng
+  // 		}
+  // 	})
+  // }
+  // best solution
+  // 인터페이스를 만든다. 
+  // 접근 과정) marker 메소드를 사용 하고 싶다면 location 에 대한 정보만 있으면 되니 
+  // Mappable 이라는 인터페이스를 만들어서 이 타입만 충족한다면 메소드를 사용할 수 있도록 한다.
+
+
+  Map.prototype.addMarker = function (mappable) {
+    var _this = this;
+
+    var marker = new google.maps.Marker({
+      map: this.googleMap,
+      position: {
+        lat: mappable.location.lat,
+        lng: mappable.location.lng
+      }
+    });
+    marker.addListener('click', function () {
+      var popUp = new google.maps.InfoWindow({
+        content: mappable.markerContent()
+      });
+      popUp.open(_this.googleMap, marker);
+    });
+  };
+
+  return Map;
+}();
+
+exports.Map = Map;
+},{}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -136946,18 +137040,15 @@ var User_1 = require("./User");
 
 var Company_1 = require("./Company");
 
+var Map_1 = require("./Map");
+
 var user = new User_1.User();
-console.log(user);
 var company = new Company_1.Company();
-console.log(company);
-new google.maps.Map(document.getElementById('map'), {
-  zoom: 1,
-  center: {
-    lat: 0,
-    lng: 0
-  }
-});
-},{"./User":"src/User.ts","./Company":"src/Company.ts"}],"../../../.nvm/versions/node/v14.15.5/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+var map = new Map_1.Map('map'); // map.googleMap은 에러가 난다 private으로 지정해주었기 때문에 
+
+map.addMarker(user);
+map.addMarker(company);
+},{"./User":"src/User.ts","./Company":"src/Company.ts","./Map":"src/Map.ts"}],"../../../.nvm/versions/node/v14.15.5/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -136985,7 +137076,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "44767" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39819" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
