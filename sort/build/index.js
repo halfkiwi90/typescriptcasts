@@ -3,43 +3,39 @@
 // 컴파일된 파일과, 소스코드가 같은 디렉토리 상에 있다면 규모가 조금만 커져도 어지럽게 된다.
 // 그래서 src, buil 디렉토리를 만들어서 분류 하기로 한다.
 // ts config 파일을 만들어서 설정을 한다. tsc --init, tsc -w
-// nodemon 과 concurrentcy 사용방법
-var Sorter = /** @class */ (function () {
-    // 문자열돌 정렬 하려고 한다.
-    // number[] | string 유니언 타입을 사용하면 number[], stirng에서 공통 속성, 메소드만 사용할 수 있다.
-    // 사용할 수 있는 메소드 들이 제한 되기 때문에 type gaurd 라는 방식을 쓴다.
-    // 원시타입은 typeof 로 참조타입은 instanceof 를 사용한다.
-    function Sorter(collection) {
-        this.collection = collection;
-    }
-    // bubble sort 를 구현했다.
-    // 이것을 오로지 숫자로 구성된 배열 타입에만 적용되도록 구성했다.
-    // 그래서 문자열에는 적용 되지 않는다. 
-    // 이유 1. 문자열은 스왑 안됨 
-    // 2. 문자열 간의 비교는 alphabetical 하지 않음 ex) 'a' < 'X'// false  a는 코드넘버 97, X는 코드넘버 88 이라서.
-    Sorter.prototype.sort = function () {
-        var length = this.collection.length;
-        for (var i = 0; i < length; i++) {
-            for (var j = 0; j < length - i - 1; j++) {
-                // All of this only works if collection is number[]
-                // If collection is an array of numbers
-                // 조건문으로 instanceof Array 를 추가해주면 배열의 모든 속성, 메소드를 사용할 수 있다.
-                if (this.collection instanceof Array) {
-                    // 이 블럭 안에서는 유니언으로 인한 제한을 받지 않는다.
-                    if (this.collection[j] > this.collection[j + 1]) {
-                        var leftHand = this.collection[j];
-                        this.collection[j] = this.collection[j + 1];
-                        this.collection[j + 1] = leftHand;
-                    }
-                }
-                // Only going to work if collection is a string
-                if (typeof this.collection === 'string') {
-                }
-            }
-        }
-    };
-    return Sorter;
-}());
-var sorter = new Sorter([10, 3, -5, 0]);
-sorter.sort();
-console.log(sorter.collection);
+Object.defineProperty(exports, "__esModule", { value: true });
+var Numbercollection_1 = require("./Numbercollection");
+var CharactersCollections_1 = require("./CharactersCollections");
+var LInkedLIst_1 = require("./LInkedLIst");
+// const charactersCollection = new CharacterCollection('Xaayb');
+// const sorter = new Sorter(charactersCollection);
+// sorter.sort();
+// console.log(charactersCollection.data)
+var linkedList = new LInkedLIst_1.LinkedList();
+linkedList.add(500);
+linkedList.add(-10);
+linkedList.add(-3);
+linkedList.add(4);
+// const sorter = new Sorter(linkedList);
+// sorter.sort();
+// linkedList.print();
+// 추상 클래스
+// 1. 추상 클래스 자체로는 인스턴스를 만들 수 없다.
+// 2. 오로지 부모클래스로만 사용한다.
+// 3. 자체로 가지고 있지 않은 값들로(자식클래스에서 제공 해준다.) 메소드들이 실행 되어야 한다.
+var numbersCollection = new Numbercollection_1.NumbersCollection([50, 3, -7, 0]);
+numbersCollection.sort();
+console.log(numbersCollection.data);
+var charactersCollection = new CharactersCollections_1.CharacterCollection('Xayab');
+charactersCollection.sort();
+linkedList.sort();
+console.log(charactersCollection.data);
+linkedList.print();
+// interface 특징
+// 1. 서로 다른 클래스, 객체 간 결합이 쉽다.
+// 2. 성질이 너무 다른 객체들을 함께 다루는 일이 있을 때 사용
+// 2. 느슨한 결합
+// abstract class 특징 
+// 1. 서로 다른 클래스, 객체간 결합 쉽ㄴ디ㅏ.
+// 2. 새로운 객체를 정의 하려고 할 때 사용
+// 2. 강한 결합, 의존성 강하다 
