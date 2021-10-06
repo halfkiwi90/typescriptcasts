@@ -1,6 +1,8 @@
 // node standart module 또한 type definition file 을 다운받아야 한다.
 // @types/node
 import fs from 'fs';
+import { CsvFileReader } from './CsvFileReader';
+import { MatchReader } from './MatchReader';
 
 // 작동 하지만 안좋은 코드
 
@@ -33,12 +35,22 @@ import fs from 'fs';
 // 3. Data array is all strings 모든 요소가 문자열이다. 날짜는 Date 타입, 숫자는 숫자로 타입을 바꿔주는게 좋다.
 
 
-// 좋은 코드 
+// 추상 클래스를 사용한 좋은 코드 
+// import { MatchReader } from './inheritance/MatchReader';
 
-import { CsvFileReader } from './CsvFileReader';
+// const reader = new MatchReader('football.csv');
+// reader.read();
 
-const reader = new CsvFileReader('football.csv');
-reader.read();
+// 인터페이스를 사용한 좋은 코드
+
+// Create an object that satisfies the 'DataReader' interface
+const csvFileReader = new CsvFileReader('football.csv');
+
+// Create an instace of MatchReader and pass in something satisfying
+// the 'DataReader' interface
+const reader = new MatchReader(csvFileReader);
+
+reader.load();
 
 // 다른 사람이 보거나 시간이 지난후 내가 봤을때 
 // 이해하기 쉽도록 변수를 만들어 준다.
@@ -52,11 +64,13 @@ const draw = 'D';
 
 // enum - enumeration
 // 객체 형식이 아닌 이넘을 사용하는 이유는 의도적으로 다른 엔지니어에게 이넘값들 사이에 간계가 가깝다고 전달해 주는 의도로 사용. 
-enum MatchResult {
-	HomeWin = 'H',
-	AwayWin = 'A',
-	Draw = 'D'
-}
+// CvsFileReader 클래스에서 이넘 타입이 필요하다. 밖으로 빼서 MatchResult 파일을 만들어서 export 해준다.
+import { MatchResult } from './MatchResult'
+// enum MatchResult {
+// 	HomeWin = 'H',
+// 	AwayWin = 'A',
+// 	Draw = 'D'
+// }
 
 let manUnitedWins = 0;
 

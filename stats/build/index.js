@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var CsvFileReader_1 = require("./CsvFileReader");
+var MatchReader_1 = require("./MatchReader");
 // 작동 하지만 안좋은 코드
 // parse csv파일을 분석하기 좋게 가공
 // const matches = fs.readFileSync('football.csv', {
@@ -20,13 +22,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // }
 // 출력
 // console.log(manUnitedWins)
-// 안좋은 코드인 이유
+// 위 코드가 좋지 않은 이유
 // 1. 조건문, match[5] === 'H' 는 데이터에 대한 배경지식이 없으면 이해하기 어렵다.
 // 2. 소스코드가 하드코딩되어 있다. csv파일을 변환해 줄 때 재사용 가능 하도록 만들자.
-// 좋은 코드 
-var CsvFileReader_1 = require("./CsvFileReader");
-var reader = new CsvFileReader_1.CsvFileReader('football.csv');
-reader.read();
+// 3. Data array is all strings 모든 요소가 문자열이다. 날짜는 Date 타입, 숫자는 숫자로 타입을 바꿔주는게 좋다.
+// 추상 클래스를 사용한 좋은 코드 
+// import { MatchReader } from './inheritance/MatchReader';
+// const reader = new MatchReader('football.csv');
+// reader.read();
+// 인터페이스를 사용한 좋은 코드
+// Create an object that satisfies the 'DataReader' interface
+var csvFileReader = new CsvFileReader_1.CsvFileReader('football.csv');
+// Create an instace of MatchReader and pass in something satisfying
+// the 'DataReader' interface
+var reader = new MatchReader_1.MatchReader(csvFileReader);
+reader.load();
 // 다른 사람이 보거나 시간이 지난후 내가 봤을때 
 // 이해하기 쉽도록 변수를 만들어 준다.
 var homWin = 'H';
@@ -38,19 +48,20 @@ var draw = 'D';
 // 하지만 위의 방식으로는 사용되지 않는 값이라고 생각하고 지울 가능성이 있다.
 // enum - enumeration
 // 객체 형식이 아닌 이넘을 사용하는 이유는 의도적으로 다른 엔지니어에게 이넘값들 사이에 간계가 가깝다고 전달해 주는 의도로 사용. 
-var MatchResult;
-(function (MatchResult) {
-    MatchResult["HomeWin"] = "H";
-    MatchResult["AwayWin"] = "A";
-    MatchResult["Draw"] = "D";
-})(MatchResult || (MatchResult = {}));
+// CvsFileReader 클래스에서 이넘 타입이 필요하다. 밖으로 빼서 MatchResult 파일을 만들어서 export 해준다.
+var MatchResult_1 = require("./MatchResult");
+// enum MatchResult {
+// 	HomeWin = 'H',
+// 	AwayWin = 'A',
+// 	Draw = 'D'
+// }
 var manUnitedWins = 0;
 for (var _i = 0, _a = reader.data; _i < _a.length; _i++) {
     var match = _a[_i];
-    if (match[1] === 'Man United' && match[5] === MatchResult.HomeWin) {
+    if (match[1] === 'Man United' && match[5] === MatchResult_1.MatchResult.HomeWin) {
         manUnitedWins++;
     }
-    else if (match[2] === 'Man United' && match[5] === MatchResult.AwayWin) {
+    else if (match[2] === 'Man United' && match[5] === MatchResult_1.MatchResult.AwayWin) {
         manUnitedWins++;
     }
 }

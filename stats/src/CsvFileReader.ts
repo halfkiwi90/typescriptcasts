@@ -1,5 +1,10 @@
+// 백업
 import fs from 'fs';
-import { dateStringToDate } from './utils';
+
+
+// read 함수의 리턴 타입이 any인것은 부적절하다.
+// 튜플로 타입을 정의해 주면 좋다.
+;
 
 export class CsvFileReader {
 	data: string[][] = [];
@@ -13,16 +18,6 @@ export class CsvFileReader {
 		.split('\n')
 		.map((row: string): string[] => {
 			return row.split(',')
-		})
-		.map((row: string[]): any => {
-			return [
-				dateStringToDate(row[0]),
-				row[1],
-				row[2],
-				parseInt(row[3]),
-				parseInt(row[4]),
-				
-			]
 		})
 	}
 
