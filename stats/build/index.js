@@ -45,24 +45,14 @@ var awayWin = 'A';
 // 홈윈, 어웨이 윈 뿐만 아니라 무승부라는 정보도 있다는것은 다른 개발자 에게 중요한 정보일 수 있다.
 // 그래서 사용하지는 않치만 선언은 해둔다.
 var draw = 'D';
-// 하지만 위의 방식으로는 사용되지 않는 값이라고 생각하고 지울 가능성이 있다.
-// enum - enumeration
-// 객체 형식이 아닌 이넘을 사용하는 이유는 의도적으로 다른 엔지니어에게 이넘값들 사이에 간계가 가깝다고 전달해 주는 의도로 사용. 
-// CvsFileReader 클래스에서 이넘 타입이 필요하다. 밖으로 빼서 MatchResult 파일을 만들어서 export 해준다.
-var MatchResult_1 = require("./MatchResult");
 // enum MatchResult {
 // 	HomeWin = 'H',
 // 	AwayWin = 'A',
 // 	Draw = 'D'
 // }
-var manUnitedWins = 0;
-for (var _i = 0, _a = reader.data; _i < _a.length; _i++) {
-    var match = _a[_i];
-    if (match[1] === 'Man United' && match[5] === MatchResult_1.MatchResult.HomeWin) {
-        manUnitedWins++;
-    }
-    else if (match[2] === 'Man United' && match[5] === MatchResult_1.MatchResult.AwayWin) {
-        manUnitedWins++;
-    }
-}
-console.log(manUnitedWins);
+// putting it all together
+var ConsoleReport_1 = require("./reportTarget/ConsoleReport");
+var WinsAnalysis_1 = require("./analyzers/WinsAnalysis");
+var Summary_1 = require("./Summary");
+var summary = new Summary_1.Summary(new WinsAnalysis_1.WinsAnalysis('Man United'), new ConsoleReport_1.ConsoleReport());
+summary.buidAndPrintReport(reader.data);
