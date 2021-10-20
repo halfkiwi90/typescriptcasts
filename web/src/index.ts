@@ -1,12 +1,25 @@
+import { UserForm } from "./views/UserForm";
 import { User } from "./models/User";
 
-const user = User.buildUser({ id: 1 });
+const user = User.buildUser({ name: 'view', age: 20 })
 
-user.on('change', () => {
-	console.log(user)
-})
 
-user.fetch();
+const root = document.getElementById('root')
+
+if (root) {
+	const userForm = new UserForm(root, user)
+
+	userForm.render();
+}
+
+
+
+
+
+// collection.on('change', () => {
+// 	console.log(collection)
+// })
+// collection.fetch();
 
 // interface에 optional ? 옵션을 줘서 data 없는 user 인스턴스를 만들었다.
 // const user = new User({ name: 'noid' , age: 0 });
